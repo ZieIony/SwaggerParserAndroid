@@ -1,0 +1,2 @@
+include ':swaggerparser', ':swaggerparsercore', ':swaggerparserv2converter', ':swaggerparserv3'
+rootProject.name='SwaggerParserAndroid'
