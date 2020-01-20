@@ -1,8 +1,26 @@
 package io.swagger.v3.parser;
 
+import android.util.Log;
+
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import org.apache.commons.io.FileUtils;
+
+import java.net.URI;
+import java.nio.charset.Charset;
+import org.lukhnos.nnio.file.Files;
+import org.lukhnos.nnio.file.Path;
+import org.lukhnos.nnio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ServiceLoader;
+
+import javax.net.ssl.SSLHandshakeException;
+
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.parser.core.extensions.SwaggerParserExtension;
 import io.swagger.v3.parser.core.models.AuthorizationValue;
@@ -13,25 +31,10 @@ import io.swagger.v3.parser.util.InlineModelResolver;
 import io.swagger.v3.parser.util.OpenAPIDeserializer;
 import io.swagger.v3.parser.util.RemoteUrl;
 import io.swagger.v3.parser.util.ResolverFully;
-import org.apache.commons.io.FileUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.net.ssl.SSLHandshakeException;
-import java.net.URI;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ServiceLoader;
 
 public class OpenAPIV3Parser implements SwaggerParserExtension {
     private static ObjectMapper JSON_MAPPER, YAML_MAPPER;
-    private static final Logger LOGGER = LoggerFactory.getLogger(OpenAPIV3Parser.class);
+    private static final String TAG = "swagger parser";
     private static String encoding = "UTF-8";
 
     static {
@@ -81,7 +84,7 @@ public class OpenAPIV3Parser implements SwaggerParserExtension {
         }
 
         catch (Exception e) {
-            LOGGER.warn("Exception while reading:", e);
+            Log.w(TAG, "Exception while reading:", e);
             result.setMessages(Arrays.asList(e.getMessage()));
         }
         return result;
@@ -104,7 +107,7 @@ public class OpenAPIV3Parser implements SwaggerParserExtension {
         for (SwaggerParserExtension extension : parserExtensions) {
             parsed = extension.readLocation(location, auths, resolve);
             for (String message : parsed.getMessages()) {
-                LOGGER.info("{}: {}", extension, message);
+                Log.i(TAG, extension + ": " + message);
             }
             output = parsed.getOpenAPI();
             if (output != null) {
@@ -150,10 +153,10 @@ public class OpenAPIV3Parser implements SwaggerParserExtension {
                     data = ClasspathHelper.loadFileFromClasspath(location);
                 }
             }
-            LOGGER.debug("Loaded raw data: {}", data);
+            Log.d(TAG, "Loaded raw data: " + data);
             ObjectMapper mapper = getRightMapper(data);
             JsonNode rootNode = mapper.readTree(data);
-            LOGGER.debug("Parsed rootNode: {}", rootNode);
+            Log.d(TAG, "Parsed rootNode: " + rootNode);
             return readWithInfo(location, rootNode);
         }
         catch (SSLHandshakeException e) {
@@ -164,7 +167,7 @@ public class OpenAPIV3Parser implements SwaggerParserExtension {
             return output;
         }
         catch (JsonParseException e) {
-            LOGGER.warn("Exception while parsing:", e);
+            Log.w(TAG, "Exception while parsing:", e);
             SwaggerParseResult output = new SwaggerParseResult();
             String message = e.getOriginalMessage();
             if ((message != null) && (message.startsWith("Duplicate field"))) {
@@ -175,7 +178,7 @@ public class OpenAPIV3Parser implements SwaggerParserExtension {
             return output;
         }
         catch (Exception e) {
-            LOGGER.warn("Exception while reading:", e);
+            Log.w(TAG, "Exception while reading:", e);
             SwaggerParseResult output = new SwaggerParseResult();
             output.setMessages(Arrays.asList("unable to read location `" + location + "`"));
             return output;

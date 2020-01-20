@@ -1,5 +1,9 @@
 package io.swagger.v3.parser.processors;
 
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
+
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.callbacks.Callback;
 import io.swagger.v3.oas.models.examples.Example;
@@ -11,11 +15,6 @@ import io.swagger.v3.oas.models.parameters.RequestBody;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.parser.ResolverCache;
-
-
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
 
 
 /**
@@ -148,7 +147,8 @@ public class ComponentsProcessor {
         for (String securitySchemeName : securitySchemeKey) {
             final SecurityScheme securityScheme = securitySchemes.get(securitySchemeName);
             SecurityScheme resolvedSecurityScheme = securitySchemeProcessor.processSecurityScheme(securityScheme);
-            securitySchemes.replace(securitySchemeName,securityScheme,resolvedSecurityScheme);
+            if(securitySchemes.containsKey(securitySchemeName))
+                securitySchemes.put(securitySchemeName,resolvedSecurityScheme);
         }
     }
 

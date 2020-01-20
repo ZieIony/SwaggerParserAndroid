@@ -1,10 +1,35 @@
 package io.swagger.v3.parser.util;
 
+import com.annimon.stream.Optional;
+import com.annimon.stream.Stream;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
+
+import org.apache.commons.lang3.StringUtils;
+
+import java.math.BigDecimal;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import io.swagger.v3.core.util.Json;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.ExternalDocumentation;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -13,9 +38,11 @@ import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.Paths;
 import io.swagger.v3.oas.models.callbacks.Callback;
 import io.swagger.v3.oas.models.examples.Example;
-import io.swagger.v3.oas.models.links.Link;
+import io.swagger.v3.oas.models.headers.Header;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.info.License;
+import io.swagger.v3.oas.models.links.Link;
 import io.swagger.v3.oas.models.media.ArraySchema;
 import io.swagger.v3.oas.models.media.ByteArraySchema;
 import io.swagger.v3.oas.models.media.ComposedSchema;
@@ -29,13 +56,6 @@ import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.oas.models.media.ObjectSchema;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.media.XML;
-import io.swagger.v3.oas.models.security.OAuthFlow;
-import io.swagger.v3.oas.models.security.OAuthFlows;
-import io.swagger.v3.oas.models.security.Scopes;
-import io.swagger.v3.oas.models.security.SecurityScheme;
-import io.swagger.v3.oas.models.tags.Tag;
-import io.swagger.v3.oas.models.info.License;
-import io.swagger.v3.oas.models.headers.Header;
 import io.swagger.v3.oas.models.parameters.CookieParameter;
 import io.swagger.v3.oas.models.parameters.HeaderParameter;
 import io.swagger.v3.oas.models.parameters.Parameter;
@@ -45,28 +65,18 @@ import io.swagger.v3.oas.models.parameters.QueryParameter;
 import io.swagger.v3.oas.models.parameters.RequestBody;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
+import io.swagger.v3.oas.models.security.OAuthFlow;
+import io.swagger.v3.oas.models.security.OAuthFlows;
+import io.swagger.v3.oas.models.security.Scopes;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
 import io.swagger.v3.oas.models.servers.ServerVariable;
 import io.swagger.v3.oas.models.servers.ServerVariables;
+import io.swagger.v3.oas.models.tags.Tag;
 import io.swagger.v3.parser.core.models.SwaggerParseResult;
-import io.swagger.v3.core.util.Json;
-
-import org.apache.commons.lang3.StringUtils;
 
 import static io.swagger.v3.core.util.RefUtils.extractSimpleName;
-
-import java.math.BigDecimal;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.text.ParseException;
-import java.time.OffsetDateTime;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 
 public class OpenAPIDeserializer {
@@ -552,14 +562,14 @@ public class OpenAPIDeserializer {
                     ObjectNode path = (ObjectNode) pathValue;
                     PathItem pathObj = getPathItem(path,String.format("%s.'%s'", location,pathName), result);
                     String[] eachPart = pathName.split("[-/.]+");
-                    Arrays.stream(eachPart)
+                    com.annimon.stream.Stream.of(eachPart)
                             .filter(part -> part.startsWith("{") && part.endsWith("}") && part.length() > 2)
                             .forEach(part -> {
                                 String pathParam = part.substring(1, part.length() - 1);
                                 boolean definedInPathLevel = isPathParamDefined(pathParam, pathObj.getParameters());
                                 if (!definedInPathLevel) {
                                     List<Operation> operationsInAPath = getAllOperationsInAPath(pathObj);
-                                    operationsInAPath.forEach(operation -> {
+                                    com.annimon.stream.Stream.of(operationsInAPath).forEach(operation -> {
                                         if (!isPathParamDefined(pathParam, operation.getParameters())) {
                                             result.warning(location + ".'" + pathName + "'"," Declared path parameter " + pathParam + " needs to be defined as a path parameter in path or operation level");
                                             return;
@@ -578,7 +588,7 @@ public class OpenAPIDeserializer {
         if (parameters == null || parameters.isEmpty()) {
             return false;
         } else {
-            Parameter pathParamDefined = parameters.stream()
+            Parameter pathParamDefined = com.annimon.stream.Stream.of(parameters)
                             .filter(parameter -> (parameter.get$ref() != null) || (pathParam.equals(parameter.getName()) && "path".equals(parameter.getIn())))
                             .findFirst()
                             .orElse(null);
@@ -1428,7 +1438,7 @@ public class OpenAPIDeserializer {
         Set<String> filter = new HashSet<>();
 
 
-        parameters.stream().map(this::getParameterDefinition).forEach(param -> {
+        com.annimon.stream.Stream.of(parameters).map(this::getParameterDefinition).forEach(param -> {
             String ref = param.get$ref();
             if(!filter.add(param.getName()+"#"+param.getIn())) {
                 if(ref != null) {
@@ -1831,7 +1841,7 @@ public class OpenAPIDeserializer {
         }
 
         final String securitySchemeIn = getString("in", node, inRequired, location, result);
-        final Optional<SecurityScheme.In> matchingIn = Arrays.stream(SecurityScheme.In.values())
+        final Optional<SecurityScheme.In> matchingIn = com.annimon.stream.Stream.of(SecurityScheme.In.values())
                 .filter(in -> in.toString().equals(securitySchemeIn))
                 .findFirst();
 
@@ -2460,16 +2470,18 @@ public class OpenAPIDeserializer {
     /**
      * Returns the Date represented by the given RFC3339 date-time string.
      * Returns null if this string can't be parsed as Date.
+     * @return
      */
-    private OffsetDateTime toDateTime(String dateString) {
+    private Date toDateTime(String dateString) {
+        SimpleDateFormat mSimpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssX");
 
-        OffsetDateTime dateTime = null;
+        Date newDate = null;
         try {
-            dateTime = OffsetDateTime.parse(dateString);
+            newDate = mSimpleDateFormat.parse(dateString);
         } catch (Exception ignore) {
         }
 
-        return dateTime;
+        return newDate;
     }
     
 
@@ -2487,11 +2499,7 @@ public class OpenAPIDeserializer {
             String day = matcher.group(3);
 
             try {
-                date=
-                    new Calendar.Builder()
-                    .setDate( Integer.parseInt( year), Integer.parseInt( month) - 1, Integer.parseInt( day))
-                    .build()
-                    .getTime();
+                date = new Date(Integer.parseInt(year), Integer.parseInt(month) - 1, Integer.parseInt(day));
             }
             catch( Exception ignore) {
             }
@@ -2509,7 +2517,7 @@ public class OpenAPIDeserializer {
         byte[] bytes;
         
         try {
-            bytes = Base64.getDecoder().decode( byteString);
+            bytes = android.util.Base64.decode(byteString.getBytes(), android.util.Base64.DEFAULT);
         }
         catch( Exception e) {
             bytes = null;
@@ -2877,7 +2885,7 @@ public class OpenAPIDeserializer {
                                         .generate(arrayNode.elements()::next)
                                         .map((n) -> n.asText())
                                         .limit(arrayNode.size())
-                                        .collect(Collectors.toList());
+                                        .toList();
                                 securityRequirement.addList(key, scopes);
                             }
                         }

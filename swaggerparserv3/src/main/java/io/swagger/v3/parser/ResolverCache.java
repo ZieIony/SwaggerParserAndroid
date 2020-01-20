@@ -2,23 +2,14 @@ package io.swagger.v3.parser;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.swagger.v3.oas.models.OpenAPI;
-import io.swagger.v3.oas.models.media.Schema;
-import io.swagger.v3.oas.models.parameters.Parameter;
-import io.swagger.v3.oas.models.responses.ApiResponse;
-import io.swagger.v3.parser.core.models.AuthorizationValue;
-import io.swagger.v3.parser.models.RefFormat;
-import io.swagger.v3.parser.models.RefType;
-import io.swagger.v3.parser.util.DeserializationUtils;
-import io.swagger.v3.parser.util.PathUtils;
-import io.swagger.v3.parser.util.RefUtils;
-import io.swagger.v3.parser.util.OpenAPIDeserializer;
+
 import org.apache.commons.lang3.StringUtils;
+import org.lukhnos.nnio.file.Path;
+import org.lukhnos.nnio.file.Paths;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -27,6 +18,17 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.media.Schema;
+import io.swagger.v3.oas.models.parameters.Parameter;
+import io.swagger.v3.parser.core.models.AuthorizationValue;
+import io.swagger.v3.parser.models.RefFormat;
+import io.swagger.v3.parser.models.RefType;
+import io.swagger.v3.parser.util.DeserializationUtils;
+import io.swagger.v3.parser.util.OpenAPIDeserializer;
+import io.swagger.v3.parser.util.PathUtils;
+import io.swagger.v3.parser.util.RefUtils;
 
 /**
  * A class that caches values that have been loaded so we don't have to repeat
@@ -76,7 +78,7 @@ public class ResolverCache {
             }
         } else {
             File file = new File(".");
-            parentDirectory = file.toPath();
+            parentDirectory = Paths.get(file.getAbsolutePath());
         }
 
     }

@@ -1,8 +1,9 @@
 package io.swagger.v3.parser.core.models;
 
+import com.annimon.stream.function.Predicate;
+
 import java.net.URL;
 import java.util.Objects;
-import java.util.function.Predicate;
 
 
 public class AuthorizationValue {

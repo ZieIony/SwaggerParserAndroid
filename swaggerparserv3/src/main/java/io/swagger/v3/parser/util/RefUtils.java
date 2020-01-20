@@ -1,20 +1,21 @@
 package io.swagger.v3.parser.util;
 
-import io.swagger.v3.parser.core.models.AuthorizationValue;
-import io.swagger.v3.parser.models.RefFormat;
-import io.swagger.v3.parser.processors.ExternalRefProcessor;
+import com.annimon.stream.Optional;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-
-import static java.nio.charset.StandardCharsets.UTF_8;
+import org.lukhnos.nnio.file.Files;
+import org.lukhnos.nnio.file.Path;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.nio.charset.Charset;
 import java.util.List;
-import java.util.Optional;
+
+import io.swagger.v3.parser.core.models.AuthorizationValue;
+import io.swagger.v3.parser.models.RefFormat;
+import io.swagger.v3.parser.processors.ExternalRefProcessor;
 
 public class RefUtils {
 
@@ -57,9 +58,9 @@ public class RefUtils {
             return Optional.empty();
         }
         return Optional.of(ref.split(REFERENCE_SEPARATOR))
-            .filter(it -> it.length == 2)
-            .map(it -> it[0])
-            .filter(it -> !it.isEmpty());
+                .filter(it -> it.length == 2)
+                .map(it -> it[0])
+                .filter(it -> !it.isEmpty());
     }
 
     public static boolean isAnExternalRefFormat(RefFormat refFormat) {
@@ -245,7 +246,7 @@ public class RefUtils {
 
     private static String readAll(Path path) throws IOException {
         try (InputStream inputStream = new FileInputStream(path.toFile())) {
-            return IOUtils.toString(inputStream, UTF_8);
+            return IOUtils.toString(inputStream, Charset.forName("UTF-8"));
         }
     }
 }

@@ -1,5 +1,9 @@
 package io.swagger.v3.parser.converter;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import io.swagger.models.ArrayModel;
 import io.swagger.models.ComposedModel;
 import io.swagger.models.Model;
@@ -15,10 +19,6 @@ import io.swagger.models.properties.ArrayProperty;
 import io.swagger.models.properties.MapProperty;
 import io.swagger.models.properties.ObjectProperty;
 import io.swagger.models.properties.Property;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 public class SwaggerInventory {
     private List<Path> paths = new ArrayList();

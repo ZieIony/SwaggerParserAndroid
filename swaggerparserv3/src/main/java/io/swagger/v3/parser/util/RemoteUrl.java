@@ -1,8 +1,23 @@
 package io.swagger.v3.parser.util;
 
-import io.swagger.v3.parser.core.models.AuthorizationValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -11,18 +26,8 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.*;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+
+import io.swagger.v3.parser.core.models.AuthorizationValue;
 
 
 public class RemoteUrl {
@@ -32,7 +37,7 @@ public class RemoteUrl {
 
     private static final String TRUST_ALL = String.format("%s.trustAll", RemoteUrl.class.getName());
     private static final ConnectionConfigurator CONNECTION_CONFIGURATOR = createConnectionConfigurator();
-    private static final Charset UTF_8 = StandardCharsets.UTF_8;
+    private static final Charset UTF_8 = Charset.forName("UTF-8");
     private static final String ACCEPT_HEADER_VALUE = "application/json, application/yaml, */*";
     private static final String USER_AGENT_HEADER_VALUE = "Apache-HttpClient/Swagger";
 

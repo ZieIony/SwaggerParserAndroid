@@ -1,6 +1,14 @@
 package io.swagger.v3.parser.processors;
 
 
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.LoggerFactory;
+
+import java.net.URI;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.callbacks.Callback;
@@ -10,26 +18,14 @@ import io.swagger.v3.oas.models.links.Link;
 import io.swagger.v3.oas.models.media.ArraySchema;
 import io.swagger.v3.oas.models.media.ComposedSchema;
 import io.swagger.v3.oas.models.media.MediaType;
-import io.swagger.v3.oas.models.media.ObjectSchema;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.parameters.RequestBody;
 import io.swagger.v3.oas.models.responses.ApiResponse;
-import io.swagger.v3.oas.models.responses.ApiResponses;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.parser.ResolverCache;
 import io.swagger.v3.parser.models.RefFormat;
 import io.swagger.v3.parser.models.RefType;
-import io.swagger.v3.parser.util.RefUtils;
-
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.LoggerFactory;
-
-import java.net.URI;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Objects;
 
 import static io.swagger.v3.parser.util.RefUtils.computeDefinitionName;
 import static io.swagger.v3.parser.util.RefUtils.computeRefFormat;
@@ -757,9 +753,9 @@ public final class ExternalRefProcessor {
         }
         String $ref = subRef.get$ref();
         String subRefExternalPath = getExternalPath(subRef.get$ref())
-            .orElse(null);
+                .orElse(null);
 
-        if (format.equals(RefFormat.RELATIVE) && !Objects.equals(subRefExternalPath, externalFile)) {
+        if (format.equals(RefFormat.RELATIVE) && !(subRefExternalPath == externalFile || (subRefExternalPath != null && subRefExternalPath.equals(externalFile)))) {
             $ref = constructRef(subRef, externalFile);
             subRef.set$ref($ref);
         }else {
@@ -784,7 +780,7 @@ public final class ExternalRefProcessor {
         String subRefExternalPath = getExternalPath(subRef.get$ref())
                 .orElse(null);
 
-        if (format.equals(RefFormat.RELATIVE) && !Objects.equals(subRefExternalPath, externalFile)) {
+        if (format.equals(RefFormat.RELATIVE) && !(subRefExternalPath == externalFile || (subRefExternalPath != null && subRefExternalPath.equals(externalFile)))) {
             $ref = join(externalFile, subRef.get$ref());
             subRef.set$ref($ref);
         }else {
@@ -803,7 +799,7 @@ public final class ExternalRefProcessor {
         String subRefExternalPath = getExternalPath(subRef.get$ref())
                 .orElse(null);
 
-        if (format.equals(RefFormat.RELATIVE) && !Objects.equals(subRefExternalPath, externalFile)) {
+        if (format.equals(RefFormat.RELATIVE) && !(subRefExternalPath == externalFile || (subRefExternalPath != null && subRefExternalPath.equals(externalFile)))) {
             $ref = join(externalFile, subRef.get$ref());
             subRef.set$ref($ref);
         }else {
@@ -832,7 +828,7 @@ public final class ExternalRefProcessor {
             URI resolved = uri.resolve(f);
 
             URI normalized = resolved.normalize();
-            if(Character.isAlphabetic(normalized.toString().charAt(0)) && isRelative) {
+            if(Character.isLetter(normalized.toString().charAt(0)) && isRelative) {
                 return "./" + normalized.toString();
             }
             return normalized.toString();

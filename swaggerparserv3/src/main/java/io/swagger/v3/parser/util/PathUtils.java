@@ -2,9 +2,9 @@ package io.swagger.v3.parser.util;
 
 import java.net.URI;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import org.lukhnos.nnio.file.Files;
+import org.lukhnos.nnio.file.Path;
+import org.lukhnos.nnio.file.Paths;
 
 public class PathUtils {
 

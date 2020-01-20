@@ -1,5 +1,19 @@
 package io.swagger.v3.parser.util;
 
+import com.annimon.stream.Stream;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.IdentityHashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
@@ -20,18 +34,6 @@ import io.swagger.v3.oas.models.parameters.RequestBody;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
 import io.swagger.v3.parser.models.RefFormat;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.IdentityHashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import static io.swagger.v3.parser.util.RefUtils.computeDefinitionName;
 import static io.swagger.v3.parser.util.RefUtils.computeRefFormat;
@@ -227,7 +229,7 @@ public class ResolverFully {
         if (!isAnExternalRefFormat(refFormat)){
             if (headers != null && !headers.isEmpty()) {
                 String referenceKey = computeDefinitionName($ref);
-                return headers.getOrDefault(referenceKey, header);
+                return headers.containsKey(referenceKey) ? headers.get(referenceKey) : header;
             }
         }
         return header;
@@ -239,7 +241,7 @@ public class ResolverFully {
         if (!isAnExternalRefFormat(refFormat)){
             if (links != null && !links.isEmpty()) {
                 String referenceKey = computeDefinitionName($ref);
-                Link link1 = links.getOrDefault(referenceKey, link);
+                Link link1 = links.containsKey(referenceKey) ? links.get(referenceKey) : link;
                 if (link1 == null) {
                     return null;
                 }
@@ -256,7 +258,7 @@ public class ResolverFully {
         if (!isAnExternalRefFormat(refFormat)){
             if (requestBodies != null && !requestBodies.isEmpty()) {
                 String referenceKey = computeDefinitionName($ref);
-                return requestBodies.getOrDefault(referenceKey, requestBody);
+                return requestBodies.containsKey(referenceKey) ? requestBodies.get(referenceKey) : requestBody;
             }
         }
         return requestBody;
@@ -268,7 +270,7 @@ public class ResolverFully {
         if (!isAnExternalRefFormat(refFormat)){
             if (parameters != null && !parameters.isEmpty()) {
                 String referenceKey = computeDefinitionName($ref);
-                return parameters.getOrDefault(referenceKey, parameter);
+                return parameters.containsKey(referenceKey) ? parameters.get(referenceKey) : parameter;
             }
         }
         return parameter;
@@ -370,13 +372,13 @@ public class ResolverFully {
             } else {
                 // User doesn't need or want to aggregate composed schema, we only solve refs
                 if (hasAllOf) {
-                    composedSchema.allOf(composedSchema.getAllOf().stream().map(this::resolveSchema).collect(Collectors.toList()));
+                    composedSchema.allOf(Stream.of(composedSchema.getAllOf()).map(this::resolveSchema).toList());
                 }
                 if (hasOneOf) {
-                    composedSchema.oneOf(composedSchema.getOneOf().stream().map(this::resolveSchema).collect(Collectors.toList()));
+                    composedSchema.oneOf(Stream.of(composedSchema.getOneOf()).map(this::resolveSchema).toList());
                 }
                 if (hasAnyOf) {
-                    composedSchema.anyOf(composedSchema.getAnyOf().stream().map(this::resolveSchema).collect(Collectors.toList()));
+                    composedSchema.anyOf(Stream.of(composedSchema.getAnyOf()).map(this::resolveSchema).toList());
                 }
             }
         }
@@ -425,7 +427,8 @@ public class ResolverFully {
                     String ref = examples.get(name).get$ref();
                     ref = ref.substring(ref.lastIndexOf("/") + 1);
                     Example sample = this.examples.get(ref);
-                    resolveExamples.replace(name, sample);
+                    if(resolveExamples.containsKey(name))
+                        resolveExamples.put(name, sample);
                 }
             }
         }
