@@ -1,9 +1,8 @@
 package io.swagger.v3.parser.util;
 
-import com.annimon.stream.Stream;
+import android.util.Log;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.annimon.stream.Stream;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,7 +39,7 @@ import static io.swagger.v3.parser.util.RefUtils.computeRefFormat;
 import static io.swagger.v3.parser.util.RefUtils.isAnExternalRefFormat;
 
 public class ResolverFully {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ResolverFully.class);
+    private static final String TAG = "swagger parser";
 
     private boolean aggregateCombinators;
 
@@ -289,7 +288,7 @@ public class ResolverFully {
             if (resolved != null) {
 
                 if (this.resolvedModels.containsKey(ref)) {
-                    LOGGER.debug("avoiding infinite loop");
+                    Log.d(TAG, "avoiding infinite loop");
                     return resolvedModels.get(ref);
                 }
                 resolvedModels.put(ref, schema);
@@ -403,7 +402,7 @@ public class ResolverFully {
                         }
                         model.addProperties(key, property);
                     } else {
-                        LOGGER.debug("not adding recursive properties, using generic object");
+                        Log.d(TAG, "not adding recursive properties, using generic object");
                         ObjectSchema newSchema = new ObjectSchema();
                         model.addProperties(key, newSchema);
                     }
@@ -482,7 +481,7 @@ public class ResolverFully {
 
     private Schema resolveSchemaProperty(String propertyName, Schema innerProperty) {
         if (resolvedProperties.get(propertyName) == null || resolvedProperties.get(propertyName) != innerProperty) {
-            LOGGER.debug("avoiding infinite loop");
+            Log.d(TAG, "avoiding infinite loop");
             Schema resolved = resolveSchema(innerProperty);
             resolvedProperties.put(propertyName, resolved);
             return resolved;

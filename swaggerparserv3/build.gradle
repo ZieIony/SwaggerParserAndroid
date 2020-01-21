@@ -41,8 +41,6 @@ dependencies {
     implementation 'io.swagger:swagger-compat-spec-parser:1.0.49'
     implementation 'io.swagger.core.v3:swagger-models:2.1.1'
     implementation 'io.swagger.core.v3:swagger-core:2.1.1'
-    implementation 'org.slf4j:slf4j-ext:1.7.28'
-    implementation 'org.slf4j:slf4j-api:1.7.28'
     implementation 'commons-io:commons-io:2.4'
     implementation 'org.apache.commons:commons-lang3:3.7'
 

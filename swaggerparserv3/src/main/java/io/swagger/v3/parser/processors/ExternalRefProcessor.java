@@ -1,8 +1,9 @@
 package io.swagger.v3.parser.processors;
 
 
+import android.util.Log;
+
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.util.Collection;
@@ -33,7 +34,8 @@ import static io.swagger.v3.parser.util.RefUtils.getExternalPath;
 import static io.swagger.v3.parser.util.RefUtils.isAnExternalRefFormat;
 
 public final class ExternalRefProcessor {
-    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(ExternalRefProcessor.class);
+
+    private static final String TAG = "swagger parser";
 
     private final ResolverCache cache;
     private final OpenAPI openAPI;
@@ -53,7 +55,7 @@ public final class ExternalRefProcessor {
 
         if(schema == null) {
             // stop!  There's a problem.  retain the original ref
-            LOGGER.warn("unable to load model reference from `" + $ref + "`.  It may not be available " +
+            Log.w(TAG, "unable to load model reference from `" + $ref + "`.  It may not be available " +
                     "or the reference isn't a valid model schema");
             return $ref;
         }
@@ -73,7 +75,7 @@ public final class ExternalRefProcessor {
         Schema existingModel = schemas.get(possiblyConflictingDefinitionName);
 
         if (existingModel != null) {
-            LOGGER.warn("A model for " + existingModel + " already exists");
+            Log.w(TAG, "A model for " + existingModel + " already exists");
             if(existingModel.get$ref() != null) {
                 // use the new model
                 existingModel = null;
@@ -242,7 +244,7 @@ public final class ExternalRefProcessor {
         ApiResponse existingResponse = responses.get(possiblyConflictingDefinitionName);
 
         if (existingResponse != null) {
-            LOGGER.debug("A model for " + existingResponse + " already exists");
+            Log.d(TAG, "A model for " + existingResponse + " already exists");
             if(existingResponse.get$ref() != null) {
                 // use the new model
                 existingResponse = null;
@@ -276,7 +278,7 @@ public final class ExternalRefProcessor {
 
         if(body == null) {
             // stop!  There's a problem.  retain the original ref
-            LOGGER.warn("unable to load model reference from `" + $ref + "`.  It may not be available " +
+            Log.w(TAG, "unable to load model reference from `" + $ref + "`.  It may not be available " +
                     "or the reference isn't a valid model schema");
             return $ref;
         }
@@ -296,7 +298,7 @@ public final class ExternalRefProcessor {
         RequestBody existingBody= bodies.get(possiblyConflictingDefinitionName);
 
         if (existingBody != null) {
-            LOGGER.debug("A model for " + existingBody + " already exists");
+            Log.d(TAG, "A model for " + existingBody + " already exists");
             if(existingBody.get$ref() != null) {
                 // use the new model
                 existingBody = null;
@@ -336,7 +338,7 @@ public final class ExternalRefProcessor {
 
         if(header == null) {
             // stop!  There's a problem.  retain the original ref
-            LOGGER.warn("unable to load model reference from `" + $ref + "`.  It may not be available " +
+            Log.w(TAG, "unable to load model reference from `" + $ref + "`.  It may not be available " +
                     "or the reference isn't a valid model schema");
             return $ref;
         }
@@ -356,7 +358,7 @@ public final class ExternalRefProcessor {
         Header existingHeader = headers.get(possiblyConflictingDefinitionName);
 
         if (existingHeader != null) {
-            LOGGER.debug("A model for " + existingHeader + " already exists");
+            Log.d(TAG, "A model for " + existingHeader + " already exists");
             if(existingHeader.get$ref() != null) {
                 // use the new model
                 existingHeader = null;
@@ -403,7 +405,7 @@ public final class ExternalRefProcessor {
 
         if(securityScheme == null) {
             // stop!  There's a problem.  retain the original ref
-            LOGGER.warn("unable to load model reference from `" + $ref + "`.  It may not be available " +
+            Log.w(TAG, "unable to load model reference from `" + $ref + "`.  It may not be available " +
                     "or the reference isn't a valid model schema");
             return $ref;
         }
@@ -423,7 +425,7 @@ public final class ExternalRefProcessor {
         SecurityScheme existingSecurityScheme = securitySchemeMap.get(possiblyConflictingDefinitionName);
 
         if (existingSecurityScheme != null) {
-            LOGGER.debug("A model for " + existingSecurityScheme + " already exists");
+            Log.d(TAG, "A model for " + existingSecurityScheme + " already exists");
             if(existingSecurityScheme.get$ref() != null) {
                 // use the new model
                 existingSecurityScheme = null;
@@ -461,7 +463,7 @@ public final class ExternalRefProcessor {
 
         if(link == null) {
             // stop!  There's a problem.  retain the original ref
-            LOGGER.warn("unable to load model reference from `" + $ref + "`.  It may not be available " +
+            Log.w(TAG, "unable to load model reference from `" + $ref + "`.  It may not be available " +
                     "or the reference isn't a valid model schema");
             return $ref;
         }
@@ -481,7 +483,7 @@ public final class ExternalRefProcessor {
         Link existingLink = links.get(possiblyConflictingDefinitionName);
 
         if (existingLink != null) {
-            LOGGER.debug("A model for " + existingLink + " already exists");
+            Log.d(TAG, "A model for " + existingLink + " already exists");
             if(existingLink.get$ref() != null) {
                 // use the new model
                 existingLink = null;
@@ -519,7 +521,7 @@ public final class ExternalRefProcessor {
 
         if(example == null) {
             // stop!  There's a problem.  retain the original ref
-            LOGGER.warn("unable to load model reference from `" + $ref + "`.  It may not be available " +
+            Log.w(TAG, "unable to load model reference from `" + $ref + "`.  It may not be available " +
                     "or the reference isn't a valid model schema");
             return $ref;
         }
@@ -539,7 +541,7 @@ public final class ExternalRefProcessor {
         Example existingExample = examples.get(possiblyConflictingDefinitionName);
 
         if (existingExample != null) {
-            LOGGER.debug("A model for " + existingExample + " already exists");
+            Log.d(TAG, "A model for " + existingExample + " already exists");
             if(existingExample.get$ref() != null) {
                 // use the new model
                 existingExample = null;
@@ -577,7 +579,7 @@ public final class ExternalRefProcessor {
 
         if(parameter == null) {
             // stop!  There's a problem.  retain the original ref
-            LOGGER.warn("unable to load model reference from `" + $ref + "`.  It may not be available " +
+            Log.w(TAG, "unable to load model reference from `" + $ref + "`.  It may not be available " +
                     "or the reference isn't a valid model schema");
             return $ref;
         }
@@ -597,7 +599,7 @@ public final class ExternalRefProcessor {
         Parameter existingParameters = parameters.get(possiblyConflictingDefinitionName);
 
         if (existingParameters != null) {
-            LOGGER.debug("A model for " + existingParameters + " already exists");
+            Log.d(TAG, "A model for " + existingParameters + " already exists");
             if(existingParameters.get$ref() != null) {
                 // use the new model
                 existingParameters = null;
@@ -644,7 +646,7 @@ public final class ExternalRefProcessor {
 
         if(callback == null) {
             // stop!  There's a problem.  retain the original ref
-            LOGGER.warn("unable to load model reference from `" + $ref + "`.  It may not be available " +
+            Log.w(TAG, "unable to load model reference from `" + $ref + "`.  It may not be available " +
                     "or the reference isn't a valid model schema");
             return $ref;
         }
@@ -664,7 +666,7 @@ public final class ExternalRefProcessor {
         Callback existingCallback = callbacks.get(possiblyConflictingDefinitionName);
 
         if (existingCallback != null) {
-            LOGGER.debug("A model for " + existingCallback + " already exists");
+            Log.d(TAG, "A model for " + existingCallback + " already exists");
             if(existingCallback.get$ref() != null) {
                 // use the new model
                 existingCallback = null;

@@ -1,7 +1,6 @@
 package io.swagger.v3.parser.util;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -32,8 +31,7 @@ import io.swagger.v3.parser.core.models.AuthorizationValue;
 
 public class RemoteUrl {
 
-    static Logger LOGGER = LoggerFactory.getLogger(RemoteUrl.class);
-
+    private static final String TAG = "swagger parser";
 
     private static final String TRUST_ALL = String.format("%s.trustAll", RemoteUrl.class.getName());
     private static final ConnectionConfigurator CONNECTION_CONFIGURATOR = createConnectionConfigurator();
@@ -82,9 +80,9 @@ public class RemoteUrl {
                     }
                 };
             } catch (NoSuchAlgorithmException e) {
-                LOGGER.error("Not Supported", e);
+                Log.e(TAG, "Not Supported", e);
             } catch (KeyManagementException e) {
-                LOGGER.error("Not Supported", e);
+                Log.e(TAG, "Not Supported", e);
             }
         }
         return new ConnectionConfigurator() {
@@ -174,12 +172,12 @@ public class RemoteUrl {
 
             return contents.toString();
         } catch (javax.net.ssl.SSLProtocolException e) {
-            LOGGER.warn("there is a problem with the target SSL certificate");
-            LOGGER.warn("**** you may want to run with -Djsse.enableSNIExtension=false\n\n");
-            LOGGER.error("unable to read", e);
+            Log.w(TAG, "there is a problem with the target SSL certificate");
+            Log.w(TAG, "**** you may want to run with -Djsse.enableSNIExtension=false\n\n");
+            Log.e(TAG, "unable to read", e);
             throw e;
         } catch (Exception e) {
-            LOGGER.error("unable to read", e);
+            Log.e(TAG, "unable to read", e);
             throw e;
         } finally {
             if (is != null) {
