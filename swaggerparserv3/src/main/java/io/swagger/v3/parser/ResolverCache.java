@@ -277,7 +277,7 @@ public class ResolverCache {
         final Matcher parameterMatcher = pattern.matcher(ref);
 
         if (parameterMatcher.matches()) {
-            final String paramName = unescapePointer(parameterMatcher.group("name"));
+            final String paramName = unescapePointer(parameterMatcher.group(1));
 
             if (map != null) {
                 return map.get(paramName);
